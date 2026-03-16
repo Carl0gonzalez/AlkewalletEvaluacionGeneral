@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorCeleste">#2196F3</color>
+    <color name="colorCelesteSuave">#E3F2FD</color>
+    <color name="colorVerde">#4CAF50</color>
+    <color name="colorBlanco">#FFFFFF</color>
+    <color name="colorGrisFondo">#F5F5F5</color>
+    <color name="colorGrisTexto">#757575</color>
+    <color name="colorNegro">#000000</color>
+</resources>

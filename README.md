@@ -256,8 +256,8 @@ flowchart TD
 1. **Clonar el repositorio**
 
    ```bash
-   git clone https://github.com/tu-usuario/AlkeWallet.git
-   cd AlkeWallet
+   git clone https://github.com/Carl0gonzalez/AlkewalletEvaluacionModulo4.git
+   cd AlkewalletEvaluacionModulo4
    ```
 
 2. **Abrir el proyecto en Android Studio**
@@ -292,5 +292,5 @@ flowchart TD
 ---
 
 ## Autor
-
+Carlo J. González Rojas
 Proyecto desarrollado como parte del **Módulo 4 - Alke Wallet** dentro del programa de formación en desarrollo Android.

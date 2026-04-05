@@ -1,17 +1,103 @@
 # Alke Wallet
 
-Proyecto de billetera virtual desarrollado como entrega del **Módulo 4** (ABP).
+Proyecto de billetera virtual desarrollado como entrega de los **Módulos 4 y 5**.
 
-La aplicación se centra en el **diseño de la interfaz y el flujo visual** de una wallet digital, permitiendo simular acciones como iniciar sesión, registrarse, consultar balance y navegar a pantallas para enviar o solicitar dinero. No implementa lógica real de autenticación ni operaciones financieras sobre un backend.
+La aplicación se centra en el **diseño de la interfaz y el flujo visual** de una wallet digital, y en este módulo se extiende con una **arquitectura Modelo–Vista–Controlador (MVC)** para manejar la administración de fondos, las transacciones y la persistencia simple de datos entre pantallas.
+
+La app permite:
+
+- Simular inicio de sesión y registro.
+- Consultar el balance de la cuenta.
+- Ingresar (depositar) dinero.
+- Enviar (retirar) dinero.
+- Visualizar un listado dinámico de transacciones.
+
+> No se implementa lógica real de autenticación contra un backend ni operaciones financieras reales; todo ocurre de forma local en el dispositivo.
 
 ---
 
 ## Tecnologías utilizadas
 
-- **Lenguaje:** Kotlin
-- **Entorno:** Android Studio
-- **UI:** Layouts XML (ConstraintLayout, LinearLayout, etc.)
-- **Recursos:** Imágenes, íconos y tipografías exportadas desde Figma
+- **Lenguaje:** Kotlin  
+- **Entorno:** Android Studio  
+- **UI:** Layouts XML (ConstraintLayout, LinearLayout, CardView, RecyclerView)  
+- **Persistencia simple:** `SharedPreferences` para el saldo  
+- **Arquitectura:** MVC (Modelo, Controlador, Vistas en Activities + XML)  
+
+---
+
+## Arquitectura MVC (Módulo 5)
+
+### Modelo (`model/`)
+
+Contiene las clases que representan los datos y la lógica de negocio de la billetera:
+
+- `TransactionType.kt`  
+  Enum con los tipos de transacción: `INGRESO` y `ENVIO`.
+
+- `Transaction.kt`  
+  Data class que modela una transacción: id, tipo, monto, nota y fecha.
+
+- `WalletRepository.kt`  
+  Objeto responsable de:
+  - Mantener el **saldo actual**.
+  - Mantener una lista en memoria de **transacciones**.
+  - Persistir el saldo en `SharedPreferences` para conservarlo entre ejecuciones.
+  - Exponer métodos de negocio:
+    - `getBalance(context)`
+    - `getTransactions()`
+    - `deposit(context, amount, note)`
+    - `send(context, amount, note)` (valida saldo suficiente).
+
+### Controlador (`controller/`)
+
+Capa intermedia que orquesta la lógica entre las Vistas (Activities) y el Modelo:
+
+- `WalletController.kt`  
+  - Envuelve a `WalletRepository` y expone métodos de alto nivel para las Activities.  
+  - Valida montos, traduce resultados a códigos de estado y simplifica el uso del modelo desde la UI.
+
+- `WalletSendResult.kt`  
+  Enum para los resultados de un envío de dinero:
+  - `SUCCESS`
+  - `INSUFFICIENT_FUNDS`
+  - `INVALID_AMOUNT`
+
+Gracias a esta capa, las Activities no acceden directamente al repositorio, sino que delegan la lógica de negocio al controlador.
+
+### Vistas (`ui/` + `res/layout/`)
+
+Las Vistas están formadas por:
+
+- **Activities** en `ui/` que actúan como controladores de UI:
+  - `SplashActivity`
+  - `WelcomeActivity`
+  - `LoginActivity`
+  - `SignupActivity`
+  - `HomeActivity`
+  - `HomeEmptyActivity`
+  - `ProfileActivity`
+  - `SendMoneyActivity`
+  - `RequestMoneyActivity`
+
+  Cada Activity:
+  - Lee valores de los elementos de la interfaz (EditText, Button, TextView).
+  - Llama a los métodos del `WalletController`.
+  - Actualiza la UI con los resultados (por ejemplo, saldo actualizado, mensajes de error, cierre de pantalla).
+
+- **Layouts XML** en `res/layout/`:
+  - `activity_splash.xml`
+  - `activity_welcome.xml`
+  - `activity_login.xml`
+  - `activity_signup.xml`
+  - `activity_home.xml`
+  - `activity_home_empty.xml`
+  - `activity_profile.xml`
+  - `activity_send_money.xml`
+  - `activity_request_money.xml`
+  - `item_transaction.xml` (fila individual del RecyclerView de transacciones).
+
+Los layouts se encargan solo del diseño: posiciones, colores, textos y estilos.
 
 ---
 
@@ -25,51 +111,33 @@ La aplicación se centra en el **diseño de la interfaz y el flujo visual** de u
 │   └── src
 │       ├── androidTest
 │       │   └── java
-│       │       └── com
-│       │           └── cjgr
-│       │               └── awandroide
-│       │                   └── ExampleInstrumentedTest.kt
+│       │       └── com/cjgr/awandroide/ExampleInstrumentedTest.kt
 │       ├── main
 │       │   ├── AndroidManifest.xml
 │       │   ├── java
-│       │   │   └── com
-│       │   │       └── cjgr
-│       │   │           └── awandroide
-│       │   │               ├── MainActivity.kt
-│       │   │               └── ui
-│       │   │                   ├── HomeActivity.kt
-│       │   │                   ├── HomeEmptyActivity.kt
-│       │   │                   ├── LoginActivity.kt
-│       │   │                   ├── ProfileActivity.kt
-│       │   │                   ├── RequestMoneyActivity.kt
-│       │   │                   ├── SendMoneyActivity.kt
-│       │   │                   ├── SignupActivity.kt
-│       │   │                   ├── SplashActivity.kt
-│       │   │                   └── WelcomeActivity.kt
+│       │   │   └── com/cjgr/awandroide
+│       │   │       ├── MainActivity.kt
+│       │   │       ├── model
+│       │   │       │   ├── Transaction.kt
+│       │   │       │   ├── TransactionType.kt
+│       │   │       │   └── WalletRepository.kt
+│       │   │       ├── controller
+│       │   │       │   ├── WalletController.kt
+│       │   │       │   └── WalletSendResult.kt
+│       │   │       └── ui
+│       │   │           ├── HomeActivity.kt
+│       │   │           ├── HomeEmptyActivity.kt
+│       │   │           ├── LoginActivity.kt
+│       │   │           ├── ProfileActivity.kt
+│       │   │           ├── RequestMoneyActivity.kt
+│       │   │           ├── SendMoneyActivity.kt
+│       │   │           ├── SignupActivity.kt
+│       │   │           ├── SplashActivity.kt
+│       │   │           ├── TransactionAdapter.kt
+│       │   │           └── WelcomeActivity.kt
 │       │   └── res
-│       │       ├── color
-│       │       │   └── text_input_stroke.xml
-│       │       ├── drawable
-│       │       │   ├── back_icon.xml
-│       │       │   ├── bg_header_celeste.xml
-│       │       │   ├── bg_home.xml
-│       │       │   ├── bg_input_field_green.xml
-│       │       │   ├── bg_input_field.xml
-│       │       │   ├── bg_login.png
-│       │       │   ├── empty_illustration.xml
-│       │       │   ├── ic_back.xml
-│       │       │   ├── ic_edit.xml
-│       │       │   ├── ic_empty.xml
-│       │       │   ├── ic_launcher_background.xml
-│       │       │   ├── ic_launcher_foreground.xml
-│       │       │   ├── ic_logo_alke.xml
-│       │       │   ├── ic_notification.xml
-│       │       │   ├── ic_profile.xml
-│       │       │   ├── ic_request.xml
-│       │       │   ├── ic_send.xml
-│       │       │   ├── ic_splash_logo.png
-│       │       │   ├── ic_view_password.xml
-│       │       │   └── view_icon_1.xml
+│       │       ├── color/text_input_stroke.xml
+│       │       ├── drawable/… (íconos, fondos, shapes, logo, etc.)
 │       │       ├── layout
 │       │       │   ├── activity_home_empty.xml
 │       │       │   ├── activity_home.xml
@@ -80,56 +148,23 @@ La aplicación se centra en el **diseño de la interfaz y el flujo visual** de u
 │       │       │   ├── activity_send_money.xml
 │       │       │   ├── activity_signup.xml
 │       │       │   ├── activity_splash.xml
-│       │       │   └── activity_welcome.xml
-│       │       ├── mipmap-anydpi-v26
-│       │       │   ├── ic_launcher_round.xml
-│       │       │   └── ic_launcher.xml
-│       │       ├── mipmap-hdpi
-│       │       │   ├── ic_launcher_round.webp
-│       │       │   └── ic_launcher.webp
-│       │       ├── mipmap-mdpi
-│       │       │   ├── ic_launcher_round.webp
-│       │       │   └── ic_launcher.webp
-│       │       ├── mipmap-xhdpi
-│       │       │   ├── ic_launcher_round.webp
-│       │       │   └── ic_launcher.webp
-│       │       ├── mipmap-xxhdpi
-│       │       │   ├── ic_launcher_round.webp
-│       │       │   └── ic_launcher.webp
-│       │       ├── mipmap-xxxhdpi
-│       │       │   ├── ic_launcher_round.webp
-│       │       │   └── ic_launcher.webp
-│       │       ├── values
-│       │       │   ├── colors.xml
-│       │       │   ├── strings.xml
-│       │       │   └── themes.xml
-│       │       ├── values-night
-│       │       │   └── themes.xml
-│       │       └── xml
-│       │           ├── backup_rules.xml
-│       │           └── data_extraction_rules.xml
-│       └── test
-│           └── java
-│               └── com
-│                   └── cjgr
-│                       └── awandroide
-│                           └── ExampleUnitTest.kt
+│       │       │   ├── activity_welcome.xml
+│       │       │   └── item_transaction.xml
+│       │       ├── mipmap-*/ic_launcher*.xml / .webp
+│       │       ├── values/colors.xml
+│       │       ├── values/strings.xml
+│       │       ├── values/themes.xml
+│       │       ├── values-night/themes.xml
+│       │       └── xml/backup_rules.xml, data_extraction_rules.xml
+│       └── test/java/com/cjgr/awandroide/ExampleUnitTest.kt
 ├── build.gradle.kts
-├── gradle
-│   ├── gradle-daemon-jvm.properties
-│   ├── libs.versions.toml
-│   └── wrapper
-│       ├── gradle-wrapper.jar
-│       └── gradle-wrapper.properties
+├── gradle/
 ├── gradle.properties
 ├── gradlew
 ├── gradlew.bat
 ├── local.properties
-├── README.md
 └── settings.gradle.kts
 ```
-
-> El árbol anterior refleja la estructura real del proyecto, con cada **Activity**, layout y recurso organizado en su carpeta correspondiente.
 
 ---
 
@@ -156,98 +191,66 @@ flowchart TD
     I --> E
 ```
 
-- **SplashActivity:** muestra el logo de Alke Wallet y el nombre de la app al iniciar.
-- **WelcomeActivity:** pantalla de bienvenida con opciones para crear cuenta o indicar que el usuario ya tiene cuenta.
-- **LoginActivity / SignupActivity:** formularios para iniciar sesión o registrarse (navegación simulada).
-- **HomeActivity:** pantalla principal con balance, saludo, transacciones y accesos a funciones clave.
-- **SendMoneyActivity / RequestMoneyActivity:** pantallas para ingresar o enviar dinero.
-- **ProfileActivity:** pantalla de perfil del usuario.
+- **SplashActivity:** muestra el logo de Alke Wallet y el nombre de la app al iniciar.  
+- **WelcomeActivity:** pantalla de bienvenida con opciones para crear cuenta o indicar que el usuario ya tiene cuenta.  
+- **LoginActivity / SignupActivity:** formularios para iniciar sesión o registrarse (navegación simulada).  
+- **HomeActivity:** pantalla principal con balance, saludo, botones de acción y listado dinámico de transacciones.  
+- **SendMoneyActivity / RequestMoneyActivity:** pantallas para ingresar o enviar dinero usando el controlador y el modelo.  
+- **ProfileActivity:** pantalla de perfil del usuario.  
 - **HomeEmptyActivity:** variación de Home sin transacciones.
 
 ---
 
-## Pantallas implementadas
+## Listado dinámico de transacciones (RecyclerView)
 
-### 1. Splash Screen
+En **HomeActivity** se implementa un listado dinámico de transacciones:
 
-- Fondo de color sólido de la marca.
-- Logo de **Alke Wallet** centrado.
-- Nombre de la aplicación bajo el logo.
-- Se muestra al iniciar la app durante unos segundos antes de pasar al flujo de bienvenida.
+- Layout `activity_home.xml` incluye un `RecyclerView` (`rvTransactions`) y un texto de estado vacío (`txtEmptyTransactions`).
+- Layout `item_transaction.xml` define el diseño de cada ítem: ícono, título, fecha y monto.
+- Clase `TransactionAdapter`:
+  - Recibe una lista de `Transaction`.
+  - Muestra íconos y colores distintos según el tipo (`INGRESO` o `ENVIO`).
+  - Formatea montos en formato de moneda local.
 
-### 2. Login / Signup Page (Welcome)
+Las actividades de ingreso y envío (`SendMoneyActivity` y `RequestMoneyActivity`) actualizan el modelo a través del `WalletController`; al volver a Home, se recarga el saldo y la lista de transacciones.
 
-- Pantalla de bienvenida donde el usuario puede elegir entre **Crear nueva cuenta** o **Ya tiene cuenta**.
-- Dividida en dos zonas:
-  - Zona superior con fondo celeste y borde inferior redondeado (`bg_header_celeste.xml`), mostrando logo y nombre de la app.
-  - Zona inferior con fondo blanco y botones de acción.
-- Botón principal **"Crear nueva cuenta"** (fondo celeste, bordes redondeados, texto blanco).
-- Texto/botón secundario **"Ya tiene cuenta"** sin fondo, con texto celeste.
+---
 
-### 3. Login Page
+## Pantallas implementadas (resumen)
 
-- Título descriptivo de la pantalla.
-- Campos etiquetados **Email** y **Contraseña**.
-- Campo de texto + campo de contraseña con ícono para mostrar/ocultar.
-- Texto de ayuda **"Olvidaste tu contraseña"**.
-- Fondo con imagen de acuerdo al diseño de Figma.
-- Botón primario **"Login"** (fondo celeste, bordes redondeados).
-- Botón secundario **"Crear una nueva cuenta"** sin fondo y texto celeste.
-- Pulsar **Login** simula la navegación a **HomeActivity** mediante un `Intent`.
+1. **Splash Screen**  
+   Logo de Alke Wallet y nombre de la app sobre fondo de marca.
 
-### 4. Signup Page
+2. **Login / Signup Page (Welcome)**  
+   Selector con dos zonas: cabecera celeste redondeada con logo y nombre, y área blanca con:
+   - Botón principal “Crear nueva cuenta”.
+   - Texto/botón “Ya tiene cuenta”.
 
-- Título de registro.
-- Cinco campos de entrada:
-  - Tres de texto (nombre completo, email, confirmación de email u otros datos).
-  - Dos de contraseña con opción de visualización.
-- Fondo con imagen.
-- Botón principal para confirmar el registro (celeste, bordes redondeados).
-- Botón secundario para volver al Login, sin fondo y texto celeste.
+3. **Login Page**  
+   Campos de email y contraseña, botón de Login y enlace a Crear cuenta, con fondo ilustrado.
 
-### 5. Home Page
+4. **Signup Page**  
+   Formulario con cinco campos (texto y contraseñas), botón de registro y enlace a Login.
 
-- Fondo celeste con imagen/degradado en la cabecera.
-- Textos principales: **Inicio**, saludo al usuario, **Balance** y monto disponible.
-- Imagen de perfil y campanita de notificaciones.
-- Sector blanco inferior con botones:
-  - **Enviar dinero** (fondo verde, bordes redondeados).
-  - **Ingresar dinero** (fondo celeste, bordes redondeados).
-- Lista de transacciones con avatar, nombre, ícono de tipo (ingreso/envío), fecha y monto con signo.
+5. **Home Page**  
+   - Encabezado con saludo, perfil y notificaciones.  
+   - Sección de balance con monto dinámico.  
+   - Botones “Enviar dinero” e “Ingresar dinero”.  
+   - Listado dinámico de transacciones (RecyclerView).
 
-### 6. Home Page – Empty Case
+6. **Home Page – Empty Case**  
+   Variante sin transacciones, mostrando ilustración y mensaje “No hay transacciones aún”.
 
-- Misma estructura que HomeActivity.
-- Sin transacciones: se muestra un estado vacío con ilustración y mensaje indicando que aún no hay movimientos.
+7. **Profile Page**  
+   Avatar grande, nombre de usuario y secciones tipo tarjeta (datos personales, seguridad, notificaciones, ayuda).
 
-### 7. Profile Page
+8. **Send Money (Ingresar dinero)**  
+   - Campo para monto a ingresar y nota de transferencia.  
+   - Usa `WalletController.deposit` para actualizar el modelo.
 
-- Barra superior gris con el texto **Mi perfil**.
-- Imagen de perfil con bordes redondeados y círculo blanco de fondo.
-- Nombre de usuario con ícono de lápiz para edición.
-- Sector blanco con cuatro filas tipo tarjeta: ícono, texto y flecha de navegación.
-
-### 8. Send Money (Ingresar dinero)
-
-- Ícono de flecha y título **Ingresar dinero**.
-- Línea divisoria bajo la cabecera.
-- Bloque con datos del usuario/destinatario: foto, nombre y correo.
-- Textos guía **Cantidad a ingresar** y **Nota de transferencia**.
-- Campos de usuario:
-  - Campo numérico con borde celeste.
-  - Campo de texto para la nota.
-- Botón **Ingresar dinero** (color celeste, bordes redondeados).
-
-### 9. Request Money (Enviar / Solicitar dinero)
-
-- Ícono de flecha y título **Enviar dinero**.
-- Línea divisoria bajo la cabecera.
-- Perfil del contacto con inicial, nombre y correo.
-- Textos guía **Cantidad a ingresar** y **Nota de transferencia**.
-- Campos de usuario:
-  - Campo numérico con borde verde.
-  - Campo de texto para la nota.
-- Botón principal **Ingresar dinero** (celeste, bordes redondeados).
+9. **Request Money (Enviar / Solicitar dinero)**  
+   - Campo para monto a enviar y nota.  
+   - Usa `WalletController.send` y muestra mensajes según el resultado (éxito, saldo insuficiente, monto inválido).
 
 ---
 
@@ -256,41 +259,38 @@ flowchart TD
 1. **Clonar el repositorio**
 
    ```bash
-   git clone https://github.com/Carl0gonzalez/AlkewalletEvaluacionModulo4.git
-   cd AlkewalletEvaluacionModulo4
+   git clone https://github.com/Carl0gonzalez/AlkewalletEvaluacionGeneral.git
+   cd AlkewalletEvaluacionGeneral
    ```
 
 2. **Abrir el proyecto en Android Studio**
 
-   - Abrir Android Studio.
-   - Menú **File > Open**.
-   - Seleccionar la carpeta del proyecto clonada.
+   - Abrir Android Studio.  
+   - Menú **File > Open**.  
+   - Seleccionar la carpeta del proyecto clonada.  
    - Esperar a que Gradle termine de sincronizar.
 
 3. **Configurar SDK y dispositivo/emulador**
 
-   - Asegurarse de tener instalado el **Android SDK** compatible con el `compileSdk` del proyecto.
+   - Verificar que esté instalado el **Android SDK** compatible con el `compileSdk` del proyecto.  
    - Crear un **AVD** (Android Virtual Device) o conectar un dispositivo físico con depuración USB.
 
 4. **Construir el proyecto**
 
-   - Menú **Build > Make Project**.
-   - Si aparecen errores de recursos (por ejemplo, atributos duplicados en algún `TextView`), revisar los archivos XML indicados en el mensaje y corregirlos.
+   - Menú **Build > Make Project**.  
+   - Resolver cualquier aviso puntual que muestre Android Studio en los layouts o código.
 
 5. **Ejecutar la app**
 
-   - Seleccionar el emulador/dispositivo en la barra de herramientas.
-   - Pulsar **Run** (▶️) o usar **Run > Run 'app'**.
-   - La app se instalará y abrirá mostrando primero la **Splash Screen** y luego la pantalla **Welcome** con las opciones de Login y Signup.
+   - Seleccionar el emulador/dispositivo en la barra superior.  
+   - Pulsar **Run** (▶️) o usar **Run > Run 'app'**.  
+   - La app se iniciará en la **Splash Screen** y luego en **WelcomeActivity**.
 
-6. **Explorar el flujo completo**
+6. **Probar la lógica de la billetera**
 
-   - Desde **WelcomeActivity**, navegar a **LoginActivity** o **SignupActivity**.
-   - Completar el formulario y avanzar a **HomeActivity** (navegación simulada por `Intent`).
-   - Desde **HomeActivity**, acceder a **SendMoneyActivity**, **RequestMoneyActivity**, **ProfileActivity** y a la variación **HomeEmptyActivity**, y luego volver.
-
----
-
-## Autor
-Carlo J. González Rojas
-Proyecto desarrollado como parte del **Módulo 4 - Alke Wallet** dentro del programa de formación en desarrollo Android.
+   - Navegar a **HomeActivity**.  
+   - Usar **Ingresar dinero** para hacer depósitos y **Enviar dinero** para retiros.  
+   - Volver a Home y verificar que:
+     - El **saldo** se actualiza correctamente.
+     - El listado de **transacciones** muestra los nuevos movimientos.
+     - El saldo se conserva al cerrar y volver a abrir la app (persistencia en `SharedPreferences`).

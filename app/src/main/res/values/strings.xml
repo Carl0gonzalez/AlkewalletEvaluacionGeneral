@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">AwAndroide</string>
+    <string name="desc_icono_transaccion">Ícono de tipo de transacción</string>
+    <string name="tx_title_sample">Ingreso</string>
+    <string name="tx_date_sample">12/03/2026</string>
+    <string name="tx_amount_sample">+ $5.000</string>
 </resources>

@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">AwAndroide</string>
+
+    <!-- Accesibilidad -->
+    <string name="desc_foto_perfil">Foto de perfil</string>
+    <string name="desc_notificaciones">Notificaciones</string>
+    <string name="desc_icono_transaccion">Tipo de transacción</string>
+    <string name="desc_volver">Volver atrás</string>
+
+    <!-- Transacciones (item_transaction) -->
+    <string name="tx_title_sample">Transacción</string>
+    <string name="tx_date_sample">01/01/2026</string>
+    <string name="tx_amount_sample">$ 0.00</string>
 </resources>

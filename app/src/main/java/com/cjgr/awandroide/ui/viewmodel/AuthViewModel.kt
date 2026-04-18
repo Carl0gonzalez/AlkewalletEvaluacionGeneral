@@ -64,6 +64,17 @@ class AuthViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
+    fun cargarUsuario(userId: Int) {
+        viewModelScope.launch {
+            try {
+                val user = userRepository.buscarPorId(userId)
+                _currentUser.value = user
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error(e.message ?: "Error al cargar usuario")
+            }
+        }
+    }
+
     fun cerrarSesion() {
         _currentUser.value = null
         _authState.value = AuthState.Idle

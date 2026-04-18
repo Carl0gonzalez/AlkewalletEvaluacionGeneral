@@ -1,142 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
     android:background="#FFFFFF">
-
-    <ImageView
-        android:id="@+id/imgBack"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:src="@drawable/ic_back" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enviar dinero"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:layout_marginTop="8dp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#EEEEEE"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="20dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="24dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <ImageView
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:src="@drawable/ic_profile" />
+            android:id="@+id/imgBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Volver" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enviar dinero"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_marginTop="8dp" />
+
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="#EEEEEE"
+            android:layout_marginTop="12dp" android:layout_marginBottom="20dp" />
+
+        <!-- Usuario remitente -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:layout_width="52dp" android:layout_height="52dp"
+                android:src="@drawable/ic_profile" />
+
+            <LinearLayout
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical"
+                android:layout_marginStart="12dp">
+
+                <TextView android:id="@+id/txtNombreUsuario"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Usuario" android:textStyle="bold" android:textSize="16sp" />
+
+                <TextView android:id="@+id/txtCorreoUsuario"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="usuario@email.com"
+                    android:textColor="#757575" android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Sección destinatario -->
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Destinatario"
+            android:textSize="14sp" android:textColor="#000000"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Contacto seleccionado -->
+        <TextView
+            android:id="@+id/txtDestinatarioSeleccionado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ningún contacto seleccionado"
+            android:textColor="#757575"
+            android:textSize="14sp"
+            android:padding="12dp"
+            android:background="#F5F5F5"
+            android:layout_marginBottom="8dp" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="12dp">
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp">
 
-            <TextView
-                android:id="@+id/txtNombreUsuario"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Usuario"
-                android:textStyle="bold"
-                android:textSize="16sp" />
+            <Button
+                android:id="@+id/btnSeleccionarContacto"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="Seleccionar contacto"
+                android:backgroundTint="#1A1A2E"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textAllCaps="false"
+                android:layout_marginEnd="8dp"
+                app:cornerRadius="8dp" />
 
-            <TextView
-                android:id="@+id/txtCorreoUsuario"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="usuario@email.com"
-                android:textColor="#757575"
-                android:textSize="13sp" />
+            <Button
+                android:id="@+id/btnNuevoContacto"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="+ Nuevo contacto"
+                android:backgroundTint="#EEEEEE"
+                android:textColor="#1A1A2E"
+                android:textSize="13sp"
+                android:textAllCaps="false"
+                app:cornerRadius="8dp" />
         </LinearLayout>
+
+        <!-- Monto -->
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Monto a enviar"
+            android:textSize="14sp" android:textColor="#000000"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/edtMonto"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_input_field_green"
+            android:hint="$ 0.00"
+            android:inputType="numberDecimal"
+            android:paddingStart="16dp" android:paddingEnd="16dp"
+            android:textSize="14sp" android:textColor="#000000" />
+
+        <!-- Nota -->
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Nota (opcional)"
+            android:textSize="14sp" android:textColor="#000000"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/edtNota"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="Agregar nota..."
+            android:paddingStart="16dp" android:paddingEnd="16dp"
+            android:textSize="14sp" android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/btnEnviarConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Confirmar envío"
+            android:backgroundTint="@color/colorVerde"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textAllCaps="false"
+            android:layout_marginTop="32dp"
+            app:cornerRadius="12dp" />
+
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Correo del destinatario"
-        android:textSize="14sp"
-        android:textColor="#000000"
-        android:layout_marginBottom="8dp" />
-
-    <EditText
-        android:id="@+id/edtDestinatario"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:background="@drawable/bg_input_field"
-        android:hint="correo@ejemplo.com"
-        android:inputType="textEmailAddress"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textSize="14sp"
-        android:textColor="#000000" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Monto a enviar"
-        android:textSize="14sp"
-        android:textColor="#000000"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="8dp" />
-
-    <EditText
-        android:id="@+id/edtMonto"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:background="@drawable/bg_input_field_green"
-        android:hint="$ 0.00"
-        android:inputType="numberDecimal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textSize="14sp"
-        android:textColor="#000000" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nota (opcional)"
-        android:textSize="14sp"
-        android:textColor="#000000"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="8dp" />
-
-    <EditText
-        android:id="@+id/edtNota"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:background="@drawable/bg_input_field"
-        android:hint="Agregar nota..."
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textSize="14sp"
-        android:textColor="#000000" />
-
-    <Button
-        android:id="@+id/btnEnviarConfirm"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:text="Confirmar envío"
-        android:backgroundTint="@color/colorVerde"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:layout_marginTop="32dp"
-        app:cornerRadius="12dp" />
-
-</LinearLayout>
+</ScrollView>

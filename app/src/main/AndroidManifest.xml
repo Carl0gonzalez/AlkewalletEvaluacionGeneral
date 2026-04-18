@@ -10,23 +10,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AlkeWallet">
 
-        <activity android:name=".ui.SplashActivity"
-            android:exported="true">
+        <activity android:name=".ui.SplashActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.WelcomeActivity" android:exported="false" />
-        <activity android:name=".ui.LoginActivity" android:exported="false" />
-        <activity android:name=".ui.SignupActivity" android:exported="false" />
-        <activity android:name=".ui.HomeActivity" android:exported="false" />
-        <activity android:name=".ui.HomeEmptyActivity" android:exported="false" />
-        <activity android:name=".ui.ProfileActivity" android:exported="false" />
-        <activity android:name=".ui.SendMoneyActivity" android:exported="false" />
-        <activity android:name=".ui.RequestMoneyActivity" android:exported="false" />
+        <activity android:name=".ui.WelcomeActivity"      android:exported="false" />
+        <activity android:name=".ui.LoginActivity"         android:exported="false" />
+        <activity android:name=".ui.SignupActivity"        android:exported="false" />
+        <activity android:name=".ui.HomeActivity"          android:exported="false" />
+        <activity android:name=".ui.HomeEmptyActivity"     android:exported="false" />
+        <activity android:name=".ui.ProfileActivity"       android:exported="false" />
+        <activity android:name=".ui.SendMoneyActivity"     android:exported="false" />
+        <activity android:name=".ui.RequestMoneyActivity"  android:exported="false" />
+        <activity android:name=".ui.ContactsActivity"      android:exported="false" />
 
     </application>
-
 </manifest>

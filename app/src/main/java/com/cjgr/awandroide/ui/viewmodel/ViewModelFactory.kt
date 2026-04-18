@@ -2,12 +2,14 @@ package com.cjgr.awandroide.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.cjgr.awandroide.data.repository.ContactRepository
 import com.cjgr.awandroide.data.repository.TransactionRepository
 import com.cjgr.awandroide.data.repository.UserRepository
 
 class ViewModelFactory(
     private val userRepository: UserRepository,
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
+    private val contactRepository: ContactRepository? = null
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -16,6 +18,8 @@ class ViewModelFactory(
                 AuthViewModel(userRepository) as T
             modelClass.isAssignableFrom(TransactionViewModel::class.java) ->
                 TransactionViewModel(transactionRepository, userRepository) as T
+            modelClass.isAssignableFrom(ContactViewModel::class.java) ->
+                ContactViewModel(contactRepository ?: error("ContactRepository requerido")) as T
             else -> throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")
         }
     }

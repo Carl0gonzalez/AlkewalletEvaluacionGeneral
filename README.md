@@ -235,4 +235,4 @@ Verifica la carga de datos que `HomeActivity` muestra en el header y que el esta
 
 ## Autor
 Carlo J. González Rojas  
-Proyecto desarrollado como parte del programa de formación Android — **Módulo 6 · Alke Wallet**.
+Proyecto desarrollado como parte del curso DESARROLLO DE APLICACIONES MÓVILES ANDROID — **Módulo 6 · Alke Wallet**.

@@ -15,7 +15,7 @@
             android:id="@+id/txtTitleLogin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Logea y empeza a transferir!"
+            android:text="Logea y empieza a transferir!"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="#000000"

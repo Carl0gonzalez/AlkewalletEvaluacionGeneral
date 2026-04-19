@@ -185,7 +185,7 @@
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:text="Datos personales" android:textSize="15sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="›" android:textSize="22sp" android:textColor="#757575" />
+                    android:text="›" android:textSize="22sp" android:textColor="@color/colorNegro" />
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -194,7 +194,7 @@
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:text="Seguridad" android:textSize="15sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="›" android:textSize="22sp" android:textColor="#757575" />
+                    android:text="›" android:textSize="22sp" android:textColor="@color/colorNegro" />
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -203,7 +203,7 @@
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:text="Notificaciones" android:textSize="15sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="›" android:textSize="22sp" android:textColor="#757575" />
+                    android:text="›" android:textSize="22sp" android:textColor="@color/colorNegro" />
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -212,7 +212,7 @@
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:text="Ayuda" android:textSize="15sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="›" android:textSize="22sp" android:textColor="#757575" />
+                    android:text="›" android:textSize="22sp" android:textColor="@color/colorNegro" />
             </LinearLayout>
         </LinearLayout>
 

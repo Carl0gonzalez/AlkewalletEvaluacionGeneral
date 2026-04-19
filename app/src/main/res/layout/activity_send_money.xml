@@ -35,7 +35,7 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="20dp" />
 
-        <!-- Datos del remitente -->
+        <!-- Datos del remitente con foto circular -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,17 +43,26 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="24dp">
 
-            <ImageView
+            <androidx.cardview.widget.CardView
                 android:layout_width="52dp"
                 android:layout_height="52dp"
-                android:src="@drawable/ic_profile" />
+                app:cardCornerRadius="26dp"
+                app:cardElevation="2dp">
+
+                <ImageView
+                    android:id="@+id/imgFotoRemitente"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_profile"
+                    android:scaleType="centerCrop" />
+            </androidx.cardview.widget.CardView>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="12dp">
+                android:layout_marginLeft="12dp">
 
                 <TextView
                     android:id="@+id/txtNombreUsuario"
@@ -73,7 +82,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- ── SECCIÓN DESTINATARIO ── -->
+        <!-- Destinatario -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -83,7 +92,6 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
-        <!-- Contacto seleccionado / estado actual -->
         <TextView
             android:id="@+id/txtDestinatarioSeleccionado"
             android:layout_width="match_parent"
@@ -95,7 +103,6 @@
             android:background="#F5F5F5"
             android:layout_marginBottom="12dp" />
 
-        <!-- Botón 1: Seleccionar desde contactos -->
         <Button
             android:id="@+id/btnSeleccionarContacto"
             android:layout_width="match_parent"
@@ -109,7 +116,6 @@
             android:layout_marginBottom="8dp"
             app:cornerRadius="8dp" />
 
-        <!-- Botón 2: Ir a agregar nuevo contacto -->
         <Button
             android:id="@+id/btnNuevoContacto"
             android:layout_width="match_parent"
@@ -123,7 +129,6 @@
             android:layout_marginBottom="8dp"
             app:cornerRadius="8dp" />
 
-        <!-- Botón 3: Ingresar correo manualmente -->
         <Button
             android:id="@+id/btnIngresarCorreoManual"
             android:layout_width="match_parent"
@@ -137,7 +142,6 @@
             android:layout_marginBottom="12dp"
             app:cornerRadius="8dp" />
 
-        <!-- Campo correo manual (oculto por defecto) -->
         <LinearLayout
             android:id="@+id/layoutCorreoManual"
             android:layout_width="match_parent"
@@ -161,8 +165,8 @@
                 android:background="@drawable/bg_input_field"
                 android:hint="destinatario@correo.com"
                 android:inputType="textEmailAddress"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
                 android:textSize="14sp"
                 android:textColor="#000000" />
         </LinearLayout>
@@ -173,7 +177,6 @@
             android:background="#EEEEEE"
             android:layout_marginBottom="20dp" />
 
-        <!-- ── MONTO ── -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -189,12 +192,11 @@
             android:background="@drawable/bg_input_field_green"
             android:hint="$ 0.00"
             android:inputType="numberDecimal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:textSize="14sp"
             android:textColor="#000000" />
 
-        <!-- ── NOTA ── -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -210,12 +212,11 @@
             android:layout_height="52dp"
             android:background="@drawable/bg_input_field"
             android:hint="Agregar nota..."
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:textSize="14sp"
             android:textColor="#000000" />
 
-        <!-- ── CONFIRMAR ── -->
         <Button
             android:id="@+id/btnEnviarConfirm"
             android:layout_width="match_parent"

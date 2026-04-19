@@ -32,13 +32,11 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var imgPerfilGrande: ImageView
     private var userId: Int = -1
 
-    // Lanzador del selector de imagen de la galería
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val uri: Uri? = result.data?.data
                 uri?.let {
-                    // Persistir permiso de lectura para que Picasso pueda releer la URI
                     contentResolver.takePersistableUriPermission(
                         it,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -69,20 +67,18 @@ class ProfileActivity : AppCompatActivity() {
         val btnEditar      = findViewById<ImageView>(R.id.imgEditarPerfil)
         val btnGuardar     = findViewById<Button>(R.id.btnGuardarPerfil)
         val layoutEditar   = findViewById<View>(R.id.layoutEditarPerfil)
-        val btnCambiarFoto = findViewById<ImageView>(R.id.imgCambiarFoto)
+        // imgCambiarFoto ahora es MaterialButton en el layout
+        val btnCambiarFoto = findViewById<com.google.android.material.button.MaterialButton>(R.id.imgCambiarFoto)
         imgPerfilGrande    = findViewById(R.id.imgPerfilGrande)
 
         imgBack.setOnClickListener { finish() }
 
-        // ── Cargar datos y foto desde Room ─────────────────────────────────
         lifecycleScope.launch {
             authViewModel.currentUser.collect { user ->
                 user?.let {
                     txtNombre.text = it.nombre
                     edtNombre.setText(it.nombre)
                     edtCorreo.setText(it.correo)
-
-                    // Cargar foto con Picasso (URI local o URL remota)
                     if (!it.fotoPerfil.isNullOrEmpty()) {
                         cargarImagenConPicasso(it.fotoPerfil)
                     }
@@ -92,7 +88,6 @@ class ProfileActivity : AppCompatActivity() {
 
         if (userId != -1) authViewModel.cargarUsuario(userId)
 
-        // ── Cambiar foto desde galería ─────────────────────────────────────
         btnCambiarFoto.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 type = "image/*"
@@ -101,20 +96,17 @@ class ProfileActivity : AppCompatActivity() {
             pickImageLauncher.launch(intent)
         }
 
-        // ── Mostrar / ocultar formulario de edición ────────────────────────
         btnEditar.setOnClickListener {
             layoutEditar.visibility =
                 if (layoutEditar.visibility == View.GONE) View.VISIBLE else View.GONE
         }
 
-        // ── Guardar cambios de nombre/correo ───────────────────────────────
         btnGuardar.setOnClickListener {
             val nuevoNombre = edtNombre.text.toString()
             val nuevoCorreo = edtCorreo.text.toString()
             authViewModel.actualizarPerfil(userId, nuevoNombre, nuevoCorreo)
         }
 
-        // ── Observar resultados del ViewModel ──────────────────────────────
         lifecycleScope.launch {
             authViewModel.authState.collect { state ->
                 when (state) {
@@ -137,7 +129,6 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    /** Carga una imagen desde una URI local o URL remota usando Picasso. */
     private fun cargarImagenConPicasso(uriOUrl: String) {
         Picasso.get()
             .load(uriOUrl)

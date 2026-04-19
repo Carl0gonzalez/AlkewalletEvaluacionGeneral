@@ -19,6 +19,7 @@ import com.cjgr.awandroide.ui.viewmodel.ContactViewModel
 import com.cjgr.awandroide.ui.viewmodel.TransactionState
 import com.cjgr.awandroide.ui.viewmodel.TransactionViewModel
 import com.cjgr.awandroide.ui.viewmodel.ViewModelFactory
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -30,8 +31,8 @@ class SendMoneyActivity : AppCompatActivity() {
     private lateinit var authViewModel: AuthViewModel
     private lateinit var contactViewModel: ContactViewModel
     private var userId: Int = -1
-    private var selectedCorreo: String = ""   // correo elegido desde contactos
-    private var modoManual: Boolean = false   // true = usuario escribe el correo
+    private var selectedCorreo: String = ""
+    private var modoManual: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +53,7 @@ class SendMoneyActivity : AppCompatActivity() {
         val imgBack              = findViewById<ImageView>(R.id.imgBack)
         val txtNombre            = findViewById<TextView>(R.id.txtNombreUsuario)
         val txtCorreo            = findViewById<TextView>(R.id.txtCorreoUsuario)
+        val imgFotoRemitente     = findViewById<ImageView>(R.id.imgFotoRemitente)
         val txtDestinatarioSel   = findViewById<TextView>(R.id.txtDestinatarioSeleccionado)
         val btnSeleccionar        = findViewById<Button>(R.id.btnSeleccionarContacto)
         val btnNuevoContacto      = findViewById<Button>(R.id.btnNuevoContacto)
@@ -74,11 +76,20 @@ class SendMoneyActivity : AppCompatActivity() {
                 user?.let {
                     txtNombre.text = it.nombre
                     txtCorreo.text = it.correo
+                    // Cargar foto circular del remitente con Picasso
+                    if (!it.fotoPerfil.isNullOrEmpty()) {
+                        Picasso.get()
+                            .load(it.fotoPerfil)
+                            .placeholder(R.drawable.ic_profile)
+                            .error(R.drawable.ic_profile)
+                            .fit()
+                            .centerCrop()
+                            .into(imgFotoRemitente)
+                    }
                 }
             }
         }
 
-        // ── Seleccionar desde contactos guardados ─────────────────────────
         btnSeleccionar.setOnClickListener {
             val lista = contactViewModel.contactos.value
             if (lista.isEmpty()) {
@@ -105,15 +116,12 @@ class SendMoneyActivity : AppCompatActivity() {
                 .show()
         }
 
-        // ── Nuevo contacto ────────────────────────────────────────────────
         btnNuevoContacto.setOnClickListener {
             startActivity(
-                Intent(this, ContactsActivity::class.java)
-                    .putExtra("userId", userId)
+                Intent(this, ContactsActivity::class.java).putExtra("userId", userId)
             )
         }
 
-        // ── Ingresar correo manual ────────────────────────────────────────
         btnIngresarManual.setOnClickListener {
             modoManual = !modoManual
             if (modoManual) {
@@ -129,13 +137,8 @@ class SendMoneyActivity : AppCompatActivity() {
             }
         }
 
-        // ── Confirmar envío ───────────────────────────────────────────────
         btnEnviar.setOnClickListener {
-            val correoFinal = if (modoManual) {
-                edtCorreoManual.text.toString().trim()
-            } else {
-                selectedCorreo
-            }
+            val correoFinal = if (modoManual) edtCorreoManual.text.toString().trim() else selectedCorreo
 
             if (correoFinal.isEmpty()) {
                 Toast.makeText(this, "Selecciona o ingresa un destinatario", Toast.LENGTH_SHORT).show()

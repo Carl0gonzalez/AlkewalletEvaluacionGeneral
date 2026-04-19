@@ -17,14 +17,17 @@ import com.cjgr.awandroide.data.repository.TransactionRepository
 import com.cjgr.awandroide.data.repository.UserRepository
 import com.cjgr.awandroide.network.RetrofitClient
 import com.cjgr.awandroide.ui.adapter.ContactsAdapter
+import com.cjgr.awandroide.ui.viewmodel.AuthViewModel
 import com.cjgr.awandroide.ui.viewmodel.ContactState
 import com.cjgr.awandroide.ui.viewmodel.ContactViewModel
 import com.cjgr.awandroide.ui.viewmodel.ViewModelFactory
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 
 class ContactsActivity : AppCompatActivity() {
 
     private lateinit var contactViewModel: ContactViewModel
+    private lateinit var authViewModel: AuthViewModel
     private var userId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,19 +43,42 @@ class ContactsActivity : AppCompatActivity() {
             ContactRepository(db.contactDao())
         )
         contactViewModel = ViewModelProvider(this, factory)[ContactViewModel::class.java]
+        authViewModel    = ViewModelProvider(this, factory)[AuthViewModel::class.java]
 
-        val imgBack   = findViewById<ImageView>(R.id.imgBack)
-        val btnAgregar = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabAgregarContacto)
-        val recycler  = findViewById<RecyclerView>(R.id.recyclerContactos)
+        val imgBack              = findViewById<ImageView>(R.id.imgBack)
+        val imgFotoContactos     = findViewById<ImageView>(R.id.imgFotoUsuarioContactos)
+        val txtNombreContactos   = findViewById<TextView>(R.id.txtNombreUsuarioContactos)
+        val btnAgregar           = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabAgregarContacto)
+        val recycler             = findViewById<RecyclerView>(R.id.recyclerContactos)
 
         imgBack.setOnClickListener { finish() }
+
+        // Cargar datos del usuario en el header
+        if (userId != -1) authViewModel.cargarUsuario(userId)
+
+        lifecycleScope.launch {
+            authViewModel.currentUser.collect { user ->
+                user?.let {
+                    txtNombreContactos.text = it.nombre
+                    if (!it.fotoPerfil.isNullOrEmpty()) {
+                        Picasso.get()
+                            .load(it.fotoPerfil)
+                            .placeholder(R.drawable.ic_profile)
+                            .error(R.drawable.ic_profile)
+                            .fit()
+                            .centerCrop()
+                            .into(imgFotoContactos)
+                    }
+                }
+            }
+        }
 
         val adapter = ContactsAdapter(
             onEdit = { contact -> mostrarDialogoEditar(contact) },
             onDelete = { contact ->
                 AlertDialog.Builder(this)
                     .setTitle("Eliminar contacto")
-                    .setMessage("¿Eliminar a ${contact.nombre}?")
+                    .setMessage("\u00bfEliminar a ${contact.nombre}?")
                     .setPositiveButton("Eliminar") { _, _ -> contactViewModel.eliminarContacto(contact) }
                     .setNegativeButton("Cancelar", null)
                     .show()
@@ -64,9 +90,7 @@ class ContactsActivity : AppCompatActivity() {
         btnAgregar.setOnClickListener { mostrarDialogoAgregar() }
 
         lifecycleScope.launch {
-            contactViewModel.contactos.collect { lista ->
-                adapter.submitList(lista)
-            }
+            contactViewModel.contactos.collect { lista -> adapter.submitList(lista) }
         }
 
         lifecycleScope.launch {
@@ -99,10 +123,8 @@ class ContactsActivity : AppCompatActivity() {
             .setView(view)
             .setPositiveButton("Guardar") { _, _ ->
                 contactViewModel.agregarContacto(
-                    userId,
-                    edtNombre.text.toString(),
-                    edtCorreo.text.toString(),
-                    edtAlias.text.toString()
+                    userId, edtNombre.text.toString(),
+                    edtCorreo.text.toString(), edtAlias.text.toString()
                 )
             }
             .setNegativeButton("Cancelar", null)
@@ -124,10 +146,8 @@ class ContactsActivity : AppCompatActivity() {
             .setView(view)
             .setPositiveButton("Guardar") { _, _ ->
                 contactViewModel.editarContacto(
-                    contact,
-                    edtNombre.text.toString(),
-                    edtCorreo.text.toString(),
-                    edtAlias.text.toString()
+                    contact, edtNombre.text.toString(),
+                    edtCorreo.text.toString(), edtAlias.text.toString()
                 )
             }
             .setNegativeButton("Cancelar", null)

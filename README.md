@@ -45,9 +45,9 @@ ViewModel  ──►  Repository  ──►  DAO (Room)  ──►  SQLite
 app/src/main/java/com/cjgr/awandroide/
 ├── data/
 │   ├── local/
-│   │   ├── AppDatabase.kt          # Room DB v2, fallbackToDestructiveMigration
+│   │   ├── AppDatabase.kt
 │   │   ├── UserEntity.kt           # id, nombre, correo, password, saldo, fotoPerfil, token
-│   │   ├── UserDao.kt              # CRUD + updateFotoPerfil
+│   │   ├── UserDao.kt
 │   │   ├── TransactionEntity.kt
 │   │   ├── TransactionDao.kt
 │   │   ├── ContactEntity.kt
@@ -61,25 +61,24 @@ app/src/main/java/com/cjgr/awandroide/
 │   └── ApiService.kt
 ├── ui/
 │   ├── viewmodel/
-│   │   ├── AuthViewModel.kt        # login, registrar, actualizarPerfil, actualizarFotoPerfil
+│   │   ├── AuthViewModel.kt        # login, registrar, cargarUsuario, actualizarPerfil, actualizarFotoPerfil
 │   │   ├── TransactionViewModel.kt # ingresarDinero, realizarTransferencia, cargarTransacciones
 │   │   ├── ContactViewModel.kt
 │   │   ├── ViewModelFactory.kt
 │   │   └── AuthState / TransactionState (sealed classes)
-│   ├── SplashActivity.kt
-│   ├── WelcomeActivity.kt
+│   ├── HomeActivity.kt             # Header clickeable: foto y saludo navegan a ProfileActivity
+│   ├── HomeEmptyActivity.kt
 │   ├── LoginActivity.kt
 │   ├── SignupActivity.kt
-│   ├── HomeActivity.kt
-│   ├── HomeEmptyActivity.kt
-│   ├── ProfileActivity.kt          # Picasso + selector de galería
-│   ├── SendMoneyActivity.kt        # Contacto guardado ó correo manual
+│   ├── ProfileActivity.kt          # Edición inline de nombre/correo + foto con Picasso
+│   ├── SendMoneyActivity.kt
 │   ├── RequestMoneyActivity.kt
 │   └── ContactsActivity.kt
 app/src/test/java/com/cjgr/awandroide/
-├── AuthViewModelTest.kt            # 9 pruebas
-├── TransactionViewModelTest.kt     # 7 pruebas
-└── UserRepositoryTest.kt           # 8 pruebas
+├── AuthViewModelTest.kt            # 10 pruebas
+├── TransactionViewModelTest.kt     # 8 pruebas
+├── UserRepositoryTest.kt           # 8 pruebas
+└── HomeNavigationTest.kt           # 8 pruebas — carga de datos en header + refresco al volver
 ```
 
 ---
@@ -93,9 +92,9 @@ flowchart TD
     B --> D[SignupActivity]
     C --> E[HomeActivity]
     D --> C
+    E -- toca foto o saludo --> H[ProfileActivity]
     E --> F[SendMoneyActivity]
     E --> G[RequestMoneyActivity]
-    E --> H[ProfileActivity]
     E --> I[HomeEmptyActivity]
     E --> J[ContactsActivity]
     F --> E
@@ -113,20 +112,25 @@ flowchart TD
 - Login con credenciales almacenadas en Room.
 - Cierre de sesión limpia el estado del ViewModel.
 
+### Header de HomeActivity — acceso rápido al perfil
+- La **foto de perfil** (esquina superior izquierda) y el **saludo "Hola, [nombre]!"** son elementos clickeables con efecto ripple.
+- Tocar cualquiera de los dos navega directamente a `ProfileActivity` pasando el `userId`.
+- El saludo muestra un ícono de lápiz (`ic_edit`) como indicador visual de que es editable.
+- Al volver desde `ProfileActivity`, `onResume()` recarga automáticamente el nombre y la foto actualizada.
+- La foto del header se carga con Picasso desde la URI guardada en Room.
+
 ### Perfil de usuario
-- Edición de nombre y correo con validaciones (vacío, formato, correo en uso).
-- **Imagen de perfil con Picasso**: el usuario abre la galería del dispositivo con `ACTION_OPEN_DOCUMENT`, se persiste el permiso de lectura con `takePersistableUriPermission` y la URI se guarda en Room. Picasso la carga con `placeholder` y `error` apuntando a `ic_profile`.
+- Edición inline de nombre y correo con validaciones (vacío, formato, correo en uso).
+- Lanzador de galería con `ACTION_OPEN_DOCUMENT` + `takePersistableUriPermission`.
+- Foto cargada con Picasso con `placeholder` y `error` apuntando a `ic_profile`.
 
 ### Transferencias
 - Ingreso de dinero propio.
-- Transferencia a cualquier correo (el destinatario no necesita estar registrado localmente).
-- Si el destinatario existe en Room, se registra automáticamente su ingreso.
+- Transferencia a cualquier correo; si el destinatario existe en Room se registra su ingreso automáticamente.
 - Validación de saldo suficiente antes de procesar.
 
 ### Destinatario en SendMoney
-- Seleccionar un contacto guardado.
-- Agregar un nuevo contacto (navega a `ContactsActivity`).
-- Ingresar correo manualmente (toggle con `EditText`).
+- Seleccionar un contacto guardado, agregar uno nuevo o ingresar correo manualmente.
 
 ### Historial
 - Transacciones ordenadas por fecha descendente.
@@ -148,7 +152,7 @@ O desde Android Studio: clic derecho sobre la carpeta `test` → **Run Tests**.
 
 ---
 
-### `AuthViewModelTest` — 9 pruebas
+### `AuthViewModelTest` — 10 pruebas
 
 | # | Prueba | Resultado esperado |
 |---|---|---|
@@ -165,16 +169,16 @@ O desde Android Studio: clic derecho sobre la carpeta `test` → **Run Tests**.
 
 ---
 
-### `TransactionViewModelTest` — 7 pruebas
+### `TransactionViewModelTest` — 8 pruebas
 
 | # | Prueba | Resultado esperado |
 |---|---|---|
-| 1 | `ingresarDinero usuario válido` | `Success` o `Idle` (internamente llama cargarTransacciones) |
+| 1 | `ingresarDinero usuario válido` | `Success` o `Idle` |
 | 2 | `ingresarDinero usuario inexistente` | `Error("Usuario no encontrado")` |
 | 3 | `realizarTransferencia exitosa` | `Success` o `Idle` |
 | 4 | `realizarTransferencia saldo insuficiente` | `Error("Saldo insuficiente")` |
 | 5 | `realizarTransferencia remitente inexistente` | `Error("Usuario no encontrado")` |
-| 6 | `realizarTransferencia registra ingreso destinatario local` | `enviarTransaccion` llamado con `userId=2, tipo="ingreso"` |
+| 6 | `realizarTransferencia registra ingreso destinatario local` | `enviarTransaccion` con `userId=2, tipo="ingreso"` |
 | 7 | `cargarTransacciones ordena por fecha desc` | Lista con `18/04 > 10/04 > 01/04` |
 | 8 | `resetState devuelve Idle` | `TransactionState.Idle` |
 
@@ -192,6 +196,23 @@ O desde Android Studio: clic derecho sobre la carpeta `test` → **Run Tests**.
 | 6 | `actualizarFotoPerfil llama updateFotoPerfil` | Verifica URI en DAO |
 | 7 | `login credenciales correctas` | Retorna `UserEntity` |
 | 8 | `login credenciales incorrectas` | Retorna `null` |
+
+---
+
+### `HomeNavigationTest` — 8 pruebas
+
+Verifica la carga de datos que `HomeActivity` muestra en el header y que el estado se refresca correctamente al volver desde `ProfileActivity`.
+
+| # | Prueba | Resultado esperado |
+|---|---|---|
+| 1 | `cargarUsuario expone nombre y saldo` | `currentUser.nombre = "Carlo"`, `saldo = 250.0` |
+| 2 | `cargarUsuario id inválido` | `currentUser = null` |
+| 3 | `cargarUsuario expone fotoPerfil cuando existe` | URI devuelta en `currentUser.fotoPerfil` |
+| 4 | `cargarUsuario expone fotoPerfil null sin foto` | `currentUser.fotoPerfil = null` |
+| 5 | `despues de actualizarPerfil cargarUsuario devuelve nombre nuevo` | `nombre = "Carlos Nuevo"` |
+| 6 | `despues de actualizarFotoPerfil cargarUsuario devuelve nueva URI` | `fotoPerfil = "content://img/nueva"` |
+| 7 | `resetState despues de edicion deja estado Idle` | `AuthState.Idle` |
+| 8 | (reservado para extensión futura) | — |
 
 ---
 

@@ -11,6 +11,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Botón volver -->
         <ImageView
             android:id="@+id/imgBack"
             android:layout_width="32dp"
@@ -27,11 +28,14 @@
             android:textColor="#000000"
             android:layout_marginTop="8dp" />
 
-        <View android:layout_width="match_parent" android:layout_height="1dp"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
             android:background="#EEEEEE"
-            android:layout_marginTop="12dp" android:layout_marginBottom="20dp" />
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="20dp" />
 
-        <!-- Usuario remitente -->
+        <!-- Datos del remitente -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,34 +44,46 @@
             android:layout_marginBottom="24dp">
 
             <ImageView
-                android:layout_width="52dp" android:layout_height="52dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:src="@drawable/ic_profile" />
 
             <LinearLayout
-                android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
                 android:layout_marginStart="12dp">
 
-                <TextView android:id="@+id/txtNombreUsuario"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Usuario" android:textStyle="bold" android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/txtNombreUsuario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Usuario"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
 
-                <TextView android:id="@+id/txtCorreoUsuario"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                <TextView
+                    android:id="@+id/txtCorreoUsuario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="usuario@email.com"
-                    android:textColor="#757575" android:textSize="13sp" />
+                    android:textColor="#757575"
+                    android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Sección destinatario -->
+        <!-- ── SECCIÓN DESTINATARIO ── -->
         <TextView
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Destinatario"
-            android:textSize="14sp" android:textColor="#000000"
+            android:textSize="14sp"
+            android:textColor="#000000"
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
-        <!-- Contacto seleccionado -->
+        <!-- Contacto seleccionado / estado actual -->
         <TextView
             android:id="@+id/txtDestinatarioSeleccionado"
             android:layout_width="match_parent"
@@ -77,45 +93,93 @@
             android:textSize="14sp"
             android:padding="12dp"
             android:background="#F5F5F5"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="12dp" />
 
-        <LinearLayout
+        <!-- Botón 1: Seleccionar desde contactos -->
+        <Button
+            android:id="@+id/btnSeleccionarContacto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="24dp">
+            android:minHeight="48dp"
+            android:text="Seleccionar contacto guardado"
+            android:backgroundTint="#1A1A2E"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:layout_marginBottom="8dp"
+            app:cornerRadius="8dp" />
 
-            <Button
-                android:id="@+id/btnSeleccionarContacto"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:text="Seleccionar contacto"
-                android:backgroundTint="#1A1A2E"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:textAllCaps="false"
-                android:layout_marginEnd="8dp"
-                app:cornerRadius="8dp" />
+        <!-- Botón 2: Ir a agregar nuevo contacto -->
+        <Button
+            android:id="@+id/btnNuevoContacto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="+ Agregar nuevo contacto"
+            android:backgroundTint="#EEEEEE"
+            android:textColor="#1A1A2E"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:layout_marginBottom="8dp"
+            app:cornerRadius="8dp" />
 
-            <Button
-                android:id="@+id/btnNuevoContacto"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:text="+ Nuevo contacto"
-                android:backgroundTint="#EEEEEE"
-                android:textColor="#1A1A2E"
+        <!-- Botón 3: Ingresar correo manualmente -->
+        <Button
+            android:id="@+id/btnIngresarCorreoManual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="Ingresar correo manualmente"
+            android:backgroundTint="#E8F5E9"
+            android:textColor="#2E7D32"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="8dp" />
+
+        <!-- Campo correo manual (oculto por defecto) -->
+        <LinearLayout
+            android:id="@+id/layoutCorreoManual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Correo del destinatario"
                 android:textSize="13sp"
-                android:textAllCaps="false"
-                app:cornerRadius="8dp" />
+                android:textColor="#757575"
+                android:layout_marginBottom="4dp" />
+
+            <EditText
+                android:id="@+id/edtCorreoManual"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input_field"
+                android:hint="destinatario@correo.com"
+                android:inputType="textEmailAddress"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="14sp"
+                android:textColor="#000000" />
         </LinearLayout>
 
-        <!-- Monto -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#EEEEEE"
+            android:layout_marginBottom="20dp" />
+
+        <!-- ── MONTO ── -->
         <TextView
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Monto a enviar"
-            android:textSize="14sp" android:textColor="#000000"
+            android:textSize="14sp"
+            android:textColor="#000000"
             android:layout_marginBottom="8dp" />
 
         <EditText
@@ -125,14 +189,18 @@
             android:background="@drawable/bg_input_field_green"
             android:hint="$ 0.00"
             android:inputType="numberDecimal"
-            android:paddingStart="16dp" android:paddingEnd="16dp"
-            android:textSize="14sp" android:textColor="#000000" />
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textSize="14sp"
+            android:textColor="#000000" />
 
-        <!-- Nota -->
+        <!-- ── NOTA ── -->
         <TextView
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Nota (opcional)"
-            android:textSize="14sp" android:textColor="#000000"
+            android:textSize="14sp"
+            android:textColor="#000000"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="8dp" />
 
@@ -142,9 +210,12 @@
             android:layout_height="52dp"
             android:background="@drawable/bg_input_field"
             android:hint="Agregar nota..."
-            android:paddingStart="16dp" android:paddingEnd="16dp"
-            android:textSize="14sp" android:textColor="#000000" />
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textSize="14sp"
+            android:textColor="#000000" />
 
+        <!-- ── CONFIRMAR ── -->
         <Button
             android:id="@+id/btnEnviarConfirm"
             android:layout_width="match_parent"

@@ -2,7 +2,7 @@ package com.cjgr.awandroide.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Patterns
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.cjgr.awandroide.R
 import com.cjgr.awandroide.data.local.AppDatabase
-import com.cjgr.awandroide.data.local.ContactEntity
 import com.cjgr.awandroide.data.repository.ContactRepository
 import com.cjgr.awandroide.data.repository.TransactionRepository
 import com.cjgr.awandroide.data.repository.UserRepository
@@ -31,7 +30,8 @@ class SendMoneyActivity : AppCompatActivity() {
     private lateinit var authViewModel: AuthViewModel
     private lateinit var contactViewModel: ContactViewModel
     private var userId: Int = -1
-    private var selectedCorreo: String = ""
+    private var selectedCorreo: String = ""   // correo elegido desde contactos
+    private var modoManual: Boolean = false   // true = usuario escribe el correo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +39,7 @@ class SendMoneyActivity : AppCompatActivity() {
 
         userId = intent.getIntExtra("userId", -1)
 
-        val db = AppDatabase.getDatabase(this)
+        val db          = AppDatabase.getDatabase(this)
         val userRepo    = UserRepository(db.userDao())
         val txRepo      = TransactionRepository(db.transactionDao(), RetrofitClient.api)
         val contactRepo = ContactRepository(db.contactDao())
@@ -49,15 +49,18 @@ class SendMoneyActivity : AppCompatActivity() {
         authViewModel        = ViewModelProvider(this, factory)[AuthViewModel::class.java]
         contactViewModel     = ViewModelProvider(this, factory)[ContactViewModel::class.java]
 
-        val txtNombre          = findViewById<TextView>(R.id.txtNombreUsuario)
-        val txtCorreo          = findViewById<TextView>(R.id.txtCorreoUsuario)
-        val txtDestinatarioSel = findViewById<TextView>(R.id.txtDestinatarioSeleccionado)
-        val btnSeleccionar     = findViewById<Button>(R.id.btnSeleccionarContacto)
-        val btnNuevoContacto   = findViewById<Button>(R.id.btnNuevoContacto)
-        val edtMonto           = findViewById<EditText>(R.id.edtMonto)
-        val edtNota            = findViewById<EditText>(R.id.edtNota)
-        val btnEnviar          = findViewById<Button>(R.id.btnEnviarConfirm)
-        val imgBack            = findViewById<android.widget.ImageView>(R.id.imgBack)
+        val imgBack              = findViewById<ImageView>(R.id.imgBack)
+        val txtNombre            = findViewById<TextView>(R.id.txtNombreUsuario)
+        val txtCorreo            = findViewById<TextView>(R.id.txtCorreoUsuario)
+        val txtDestinatarioSel   = findViewById<TextView>(R.id.txtDestinatarioSeleccionado)
+        val btnSeleccionar        = findViewById<Button>(R.id.btnSeleccionarContacto)
+        val btnNuevoContacto      = findViewById<Button>(R.id.btnNuevoContacto)
+        val btnIngresarManual     = findViewById<Button>(R.id.btnIngresarCorreoManual)
+        val layoutCorreoManual    = findViewById<View>(R.id.layoutCorreoManual)
+        val edtCorreoManual       = findViewById<EditText>(R.id.edtCorreoManual)
+        val edtMonto              = findViewById<EditText>(R.id.edtMonto)
+        val edtNota               = findViewById<EditText>(R.id.edtNota)
+        val btnEnviar             = findViewById<Button>(R.id.btnEnviarConfirm)
 
         imgBack.setOnClickListener { finish() }
 
@@ -75,54 +78,81 @@ class SendMoneyActivity : AppCompatActivity() {
             }
         }
 
-        // ── Seleccionar contacto existente ────────────────────────────────
+        // ── Seleccionar desde contactos guardados ─────────────────────────
         btnSeleccionar.setOnClickListener {
             val lista = contactViewModel.contactos.value
             if (lista.isEmpty()) {
-                Toast.makeText(this, "No tienes contactos guardados. Agrega uno primero.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "No tienes contactos guardados.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             val nombres = lista.map {
-                if (it.alias.isNotEmpty()) "${it.alias} (${it.correo})" else "${it.nombre} (${it.correo})"
+                if (it.alias.isNotEmpty()) "${it.alias} (${it.correo})"
+                else "${it.nombre} (${it.correo})"
             }.toTypedArray()
 
             AlertDialog.Builder(this)
                 .setTitle("Seleccionar destinatario")
                 .setItems(nombres) { _, index ->
-                    val seleccionado = lista[index]
-                    selectedCorreo = seleccionado.correo
-                    txtDestinatarioSel.text = if (seleccionado.alias.isNotEmpty())
-                        "${seleccionado.alias} — ${seleccionado.correo}"
-                    else
-                        "${seleccionado.nombre} — ${seleccionado.correo}"
+                    val sel = lista[index]
+                    selectedCorreo = sel.correo
+                    modoManual = false
+                    layoutCorreoManual.visibility = View.GONE
+                    txtDestinatarioSel.text =
+                        if (sel.alias.isNotEmpty()) "${sel.alias} — ${sel.correo}"
+                        else "${sel.nombre} — ${sel.correo}"
                 }
                 .setNegativeButton("Cancelar", null)
                 .show()
         }
 
-        // ── Ir a agregar nuevo contacto ───────────────────────────────────
+        // ── Nuevo contacto ────────────────────────────────────────────────
         btnNuevoContacto.setOnClickListener {
-            val intent = Intent(this, ContactsActivity::class.java)
-            intent.putExtra("userId", userId)
-            startActivity(intent)
+            startActivity(
+                Intent(this, ContactsActivity::class.java)
+                    .putExtra("userId", userId)
+            )
         }
 
-        // ── Enviar ────────────────────────────────────────────────────────
-        btnEnviar.setOnClickListener {
-            val montoStr = edtMonto.text.toString().trim()
+        // ── Ingresar correo manual ────────────────────────────────────────
+        btnIngresarManual.setOnClickListener {
+            modoManual = !modoManual
+            if (modoManual) {
+                layoutCorreoManual.visibility = View.VISIBLE
+                selectedCorreo = ""
+                txtDestinatarioSel.text = "Ingresando correo manualmente"
+                btnIngresarManual.text = "Cancelar ingreso manual"
+            } else {
+                layoutCorreoManual.visibility = View.GONE
+                edtCorreoManual.setText("")
+                txtDestinatarioSel.text = "Ningún contacto seleccionado"
+                btnIngresarManual.text = "Ingresar correo manualmente"
+            }
+        }
 
-            if (selectedCorreo.isEmpty()) {
-                Toast.makeText(this, "Selecciona un destinatario", Toast.LENGTH_SHORT).show()
+        // ── Confirmar envío ───────────────────────────────────────────────
+        btnEnviar.setOnClickListener {
+            val correoFinal = if (modoManual) {
+                edtCorreoManual.text.toString().trim()
+            } else {
+                selectedCorreo
+            }
+
+            if (correoFinal.isEmpty()) {
+                Toast.makeText(this, "Selecciona o ingresa un destinatario", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val monto = montoStr.toDoubleOrNull()
-            if (monto == null || monto <= 0) {
-                Toast.makeText(this, "Ingresa un monto válido", Toast.LENGTH_SHORT).show()
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(correoFinal).matches()) {
+                Toast.makeText(this, "El correo del destinatario no es válido", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             val correoPropio = txtCorreo.text.toString().trim()
-            if (selectedCorreo.equals(correoPropio, ignoreCase = true)) {
+            if (correoFinal.equals(correoPropio, ignoreCase = true)) {
                 Toast.makeText(this, "No puedes transferirte dinero a ti mismo", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val monto = edtMonto.text.toString().trim().toDoubleOrNull()
+            if (monto == null || monto <= 0) {
+                Toast.makeText(this, "Ingresa un monto válido", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -131,7 +161,7 @@ class SendMoneyActivity : AppCompatActivity() {
 
             transactionViewModel.realizarTransferencia(
                 userId             = userId,
-                destinatarioCorreo = selectedCorreo,
+                destinatarioCorreo = correoFinal,
                 monto              = monto,
                 fecha              = fecha,
                 descripcion        = nota,
@@ -153,5 +183,10 @@ class SendMoneyActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (userId != -1) contactViewModel.cargarContactos(userId)
     }
 }
